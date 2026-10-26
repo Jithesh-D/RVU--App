@@ -1,8 +1,44 @@
-import { icon, multiSelectField, selectField, inputField, clubInputField, clubSelectField, clubTextArea, unique, escapeHtml, modalSelectField, safeUrl, clubIdentity, CLUB_ACCENTS } from './utils.js';
-import { schools, interests, events, clubs, announcements, projects, state, app } from './state.js';
-import { isClubCore, isSchoolRep, isSuperAdmin, canHost, canManageClub, canManageEvent, canManageAnnouncement, isFollowingClub, isItemSaved, platformSettings, roleLabel, activeClub } from './auth.js';
-import { bindEvents } from './main.js';
-import { renderAdminConsole } from './render-admin.js';
+import {
+  icon,
+  multiSelectField,
+  selectField,
+  inputField,
+  clubInputField,
+  clubSelectField,
+  clubTextArea,
+  unique,
+  escapeHtml,
+  modalSelectField,
+  safeUrl,
+  clubIdentity,
+  CLUB_ACCENTS,
+} from "./utils.js";
+import {
+  schools,
+  interests,
+  events,
+  clubs,
+  announcements,
+  projects,
+  state,
+  app,
+} from "./state.js";
+import {
+  isClubCore,
+  isSchoolRep,
+  isSuperAdmin,
+  canHost,
+  canManageClub,
+  canManageEvent,
+  canManageAnnouncement,
+  isFollowingClub,
+  isItemSaved,
+  platformSettings,
+  roleLabel,
+  activeClub,
+} from "./auth.js";
+import { bindEvents } from "./main.js";
+import { renderAdminConsole } from "./render-admin.js";
 
 function renderSessionRestoring() {
   return `
@@ -19,7 +55,9 @@ export function render() {
     if (state.authed) {
       app.innerHTML = renderAppShell();
     } else {
-      app.innerHTML = state.authResolved ? renderLanding() : renderSessionRestoring();
+      app.innerHTML = state.authResolved
+        ? renderLanding()
+        : renderSessionRestoring();
     }
     bindEvents();
   } catch (err) {
@@ -43,7 +81,7 @@ export function renderCreateEventModal() {
   const asClub = both ? hostMode === "club" : isClubCore();
   const asSchool = both ? hostMode === "school" : isSchoolRep();
   const myClub = asClub ? activeClub() : null;
-  const otherClubs = clubs.filter(c => c.id !== (myClub?.id || ""));
+  const otherClubs = clubs.filter((c) => c.id !== (myClub?.id || ""));
 
   return `
     <div style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0 80px;">
@@ -55,26 +93,42 @@ export function renderCreateEventModal() {
         </div>
 
         <div style="padding:24px;">
-          ${both ? `
+          ${
+            both
+              ? `
           <div style="margin-bottom:20px;">
             <label style="display:block;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#8a7a6a;margin-bottom:8px;font-family:inherit;">Post as *</label>
             <div style="display:flex;gap:12px;">
               <button type="button" class="btn ${hostMode === "club" ? "gold" : "secondary"}" data-action="set-create-host-mode" data-mode="club">Club core</button>
               <button type="button" class="btn ${hostMode === "school" ? "gold" : "secondary"}" data-action="set-create-host-mode" data-mode="school">School rep</button>
             </div>
-          </div>` : ""}
+          </div>`
+              : ""
+          }
 
-          ${asClub && state.host.clubAccesses && state.host.clubAccesses.length > 1
-            ? modalSelectField(
-              "ce-host-club",
-              "Hosting Club *",
-              state.host.clubAccesses.map(a => ({ value: a.club.id || a.club.slug, label: a.club.name })),
-              state.host.clubSlug || (state.host.clubAccesses[0]?.club?.id || state.host.clubAccesses[0]?.club?.slug || "")
-            )
-            : (asClub && myClub ? `
+          ${
+            asClub &&
+            state.host.clubAccesses &&
+            state.host.clubAccesses.length > 1
+              ? modalSelectField(
+                  "ce-host-club",
+                  "Hosting Club *",
+                  state.host.clubAccesses.map((a) => ({
+                    value: a.club.id || a.club.slug,
+                    label: a.club.name,
+                  })),
+                  state.host.clubSlug ||
+                    state.host.clubAccesses[0]?.club?.id ||
+                    state.host.clubAccesses[0]?.club?.slug ||
+                    "",
+                )
+              : asClub && myClub
+                ? `
           <div style="background:#e8e0d4;padding:10px 14px;margin-bottom:20px;border-left:3px solid #D7AC54;">
             <p style="font-size:12px;font-weight:600;color:#5a4a3a;margin:0;font-family:inherit;text-transform:uppercase;letter-spacing:0.05em;">Posting as ${escapeHtml(myClub.name)}</p>
-          </div>` : "")}
+          </div>`
+                : ""
+          }
 
           ${asSchool ? modalSelectField("ce-host-school", "School *", schools, state.host.school || state.user.school) : ""}
 
@@ -121,14 +175,22 @@ export function renderCreateEventModal() {
             <p style="font-size:10px;color:#8a7a6a;margin:6px 0 0;font-family:inherit;">Upload your image to imgur.com or any image host and paste the link here.</p>
           </div>
 
-          ${isClubCore() && otherClubs.length && (isClubCore() && isSchoolRep() ? (state._createHostMode || "club") === "club" : true) ? `
+          ${
+            isClubCore() &&
+            otherClubs.length &&
+            (isClubCore() && isSchoolRep()
+              ? (state._createHostMode || "club") === "club"
+              : true)
+              ? `
           <div style="margin-bottom:20px;">
             <label style="display:block;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#8a7a6a;margin-bottom:8px;font-family:inherit;">Collaborating Clubs (optional)</label>
             <select id="ce-collab" style="width:100%;border:1.5px solid #c8b89a;background:transparent;padding:10px 12px;font-size:14px;font-family:inherit;color:#1a1a1a;outline:none;">
               <option value="">None</option>
-              ${otherClubs.map(c => `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`).join("")}
+              ${otherClubs.map((c) => `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`).join("")}
             </select>
-          </div>` : ""}
+          </div>`
+              : ""
+          }
 
           <div style="display:flex;gap:10px;">
             <button style="flex:1;background:#D7AC54;color:#1a1a1a;border:none;padding:12px;font-size:12px;font-weight:800;font-family:inherit;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;" data-action="submit-create-event">Post Event</button>
@@ -142,7 +204,7 @@ export function renderCreateEventModal() {
 }
 
 export function renderEditEventModal() {
-  const event = events.find(e => e.id === state.editEventId) || {};
+  const event = events.find((e) => e.id === state.editEventId) || {};
   return `
     <div style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0 80px;">
       <div style="background:#f5f2ec;width:100%;max-width:600px;margin:0 16px;">
@@ -211,31 +273,51 @@ export function renderCreateAnnouncementModal() {
           <div style="margin-bottom:20px;">
             <label style="display:block;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#8a7a6a;margin-bottom:8px;font-family:inherit;">Type *</label>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
-              ${platformSettings().announcementTags.map((t) => `
+              ${platformSettings()
+                .announcementTags.map(
+                  (t) => `
                 <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;font-family:inherit;color:#1a1a1a;">
                   <input type="radio" name="ca-tag" value="${escapeHtml(t)}" ${t === "Notice" ? "checked" : ""} style="accent-color:#D7AC54;" />
                   ${escapeHtml(t)}
-                </label>`).join("")}
+                </label>`,
+                )
+                .join("")}
             </div>
           </div>
 
-          ${isClubCore() && isSchoolRep() ? `
+          ${
+            isClubCore() && isSchoolRep()
+              ? `
           <div style="margin-bottom:20px;">
             <label style="display:block;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#8a7a6a;margin-bottom:8px;font-family:inherit;">Post as *</label>
             <div style="display:flex;gap:12px;">
               <button type="button" class="btn ${(state._createHostMode || "club") === "club" ? "gold" : "secondary"}" data-action="set-create-host-mode" data-mode="club">Club core</button>
               <button type="button" class="btn ${(state._createHostMode || "club") === "school" ? "gold" : "secondary"}" data-action="set-create-host-mode" data-mode="school">School rep</button>
             </div>
-          </div>` : ""}
-          ${((isClubCore() && isSchoolRep() ? (state._createHostMode || "club") === "school" : isSchoolRep())) ? modalSelectField("ca-host-school", "School *", schools, state.host.school || state.user.school) : ""}
-          ${((isClubCore() && isSchoolRep() ? (state._createHostMode || "club") === "club" : isClubCore()) && state.host.clubAccesses && state.host.clubAccesses.length > 1)
-            ? modalSelectField(
-              "ca-host-club",
-              "Club *",
-              state.host.clubAccesses.map(a => ({ value: a.club.id || a.club.slug, label: a.club.name })),
-              state.host.clubSlug || (state.host.clubAccesses[0]?.club?.id || state.host.clubAccesses[0]?.club?.slug || "")
-            )
-            : ""}
+          </div>`
+              : ""
+          }
+          ${(isClubCore() && isSchoolRep() ? (state._createHostMode || "club") === "school" : isSchoolRep()) ? modalSelectField("ca-host-school", "School *", schools, state.host.school || state.user.school) : ""}
+          ${
+            (isClubCore() && isSchoolRep()
+              ? (state._createHostMode || "club") === "club"
+              : isClubCore()) &&
+            state.host.clubAccesses &&
+            state.host.clubAccesses.length > 1
+              ? modalSelectField(
+                  "ca-host-club",
+                  "Club *",
+                  state.host.clubAccesses.map((a) => ({
+                    value: a.club.id || a.club.slug,
+                    label: a.club.name,
+                  })),
+                  state.host.clubSlug ||
+                    state.host.clubAccesses[0]?.club?.id ||
+                    state.host.clubAccesses[0]?.club?.slug ||
+                    "",
+                )
+              : ""
+          }
 
           <div style="margin-bottom:20px;">
             <label style="display:block;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#8a7a6a;margin-bottom:8px;font-family:inherit;">Title *</label>
@@ -327,7 +409,7 @@ export function renderAppShell() {
           border:1.5px solid #c8b89a;
           width:clamp(150px,16vw,240px);
           padding:7px 12px;font-size:12px;font-weight:700;
-          color:#5a4a3a;cursor:pointer;font-family:inherit;
+          color:#fff;cursor:pointer;font-family:inherit;
           text-transform:uppercase;letter-spacing:0.05em;
           display:flex;align-items:center;gap:8px;justify-content:flex-start;
           box-shadow:inset 0 0 0 1px rgba(215,172,84,0.08);
@@ -341,7 +423,7 @@ export function renderAppShell() {
           <button style="
             background:rgba(215,172,84,0.06);
             border:1.5px solid #c8b89a;
-            color:#5a4a3a;
+            color:#fff;
             padding:7px 12px;
             font-size:12px;
             font-weight:700;
@@ -355,13 +437,17 @@ export function renderAppShell() {
         </div>
       </header>
       ${renderTicker()}
-      ${state.isDemoMode ? `
+      ${
+        state.isDemoMode
+          ? `
         <div style="background:#1a1a1a;border-bottom:1.5px solid #D7AC54;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:56px;z-index:90;">
           <p style="font-size:12px;font-weight:600;color:#D7AC54;margin:0;font-family:inherit;text-transform:uppercase;letter-spacing:0.08em;">
             ⚠ Demo Mode — No data is being saved. Sign in with your Google account to access your account.
           </p>
           <button style="background:#D7AC54;color:#1a1a1a;border:none;padding:4px 14px;font-size:11px;font-weight:800;font-family:inherit;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;" data-action="open-login">Sign In</button>
-        </div>` : ""}
+        </div>`
+          : ""
+      }
       <main class="main">
         ${renderRoute()}
       </main>
@@ -415,58 +501,97 @@ export function renderSearchResultsHtml() {
   const hasQuery = q.length > 1;
 
   const matchedEvents = hasQuery
-    ? events.filter(e => e.title?.toLowerCase().includes(q) || e.description?.toLowerCase().includes(q) || e.host?.toLowerCase().includes(q)).slice(0, 5)
+    ? events
+        .filter(
+          (e) =>
+            e.title?.toLowerCase().includes(q) ||
+            e.description?.toLowerCase().includes(q) ||
+            e.host?.toLowerCase().includes(q),
+        )
+        .slice(0, 5)
     : [];
 
   const matchedClubs = hasQuery
-    ? clubs.filter(c => c.name?.toLowerCase().includes(q) || c.description?.toLowerCase().includes(q) || c.category?.toLowerCase().includes(q)).slice(0, 4)
+    ? clubs
+        .filter(
+          (c) =>
+            c.name?.toLowerCase().includes(q) ||
+            c.description?.toLowerCase().includes(q) ||
+            c.category?.toLowerCase().includes(q),
+        )
+        .slice(0, 4)
     : [];
 
   const matchedProjects = hasQuery
-    ? projects.filter(p => p.title?.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q) || (p.tags || []).join(" ").toLowerCase().includes(q)).slice(0, 4)
+    ? projects
+        .filter(
+          (p) =>
+            p.title?.toLowerCase().includes(q) ||
+            p.description?.toLowerCase().includes(q) ||
+            (p.tags || []).join(" ").toLowerCase().includes(q),
+        )
+        .slice(0, 4)
     : [];
 
   const matchedAnnouncements = hasQuery
-    ? announcements.filter(a => a.title?.toLowerCase().includes(q) || a.description?.toLowerCase().includes(q) || a.source?.toLowerCase().includes(q)).slice(0, 3)
+    ? announcements
+        .filter(
+          (a) =>
+            a.title?.toLowerCase().includes(q) ||
+            a.description?.toLowerCase().includes(q) ||
+            a.source?.toLowerCase().includes(q),
+        )
+        .slice(0, 3)
     : [];
 
-  const total = matchedEvents.length + matchedClubs.length + matchedProjects.length + matchedAnnouncements.length;
+  const total =
+    matchedEvents.length +
+    matchedClubs.length +
+    matchedProjects.length +
+    matchedAnnouncements.length;
 
-  const resultGroup = (label, items, renderFn) => items.length ? `
+  const resultGroup = (label, items, renderFn) =>
+    items.length
+      ? `
     <div style="margin-bottom:24px;">
       <p style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#8a7a6a;margin:0 0 10px;font-family:inherit;">${label}</p>
       ${items.map(renderFn).join("")}
-    </div>` : "";
+    </div>`
+      : "";
 
-  const eventResult = e => `
-    <div style="padding:12px 0;border-bottom:1px solid #e8e0d4;cursor:pointer;" data-action="search-open-event" data-docid="${e.id}">
+  const eventResult = (e) => `
+    <div style="padding:12px 0;border-bottom:1px solid #1d1c1b;cursor:pointer;" data-action="search-open-event" data-docid="${e.id}">
       <p style="font-size:14px;font-weight:700;color:#1a1a1a;margin:0 0 2px;font-family:inherit;">${escapeHtml(e.title)}</p>
       <p style="font-size:12px;color:#8a7a6a;margin:0;font-family:inherit;">${escapeHtml(e.date || "")} · ${escapeHtml(e.host || e.club || "")}</p>
     </div>`;
 
-  const clubResult = c => `
+  const clubResult = (c) => `
     <div style="padding:12px 0;border-bottom:1px solid #e8e0d4;cursor:pointer;" data-action="search-open-club" data-slug="${c.slug || c.id}">
       <p style="font-size:14px;font-weight:700;color:#1a1a1a;margin:0 0 2px;font-family:inherit;">${escapeHtml(c.name)}</p>
       <p style="font-size:12px;color:#8a7a6a;margin:0;font-family:inherit;">${escapeHtml(c.category || "")} · ${escapeHtml(c.school || "")}</p>
     </div>`;
 
-  const projectResult = p => `
+  const projectResult = (p) => `
     <div style="padding:12px 0;border-bottom:1px solid #e8e0d4;cursor:pointer;" data-action="search-open-project" data-docid="${p.id}">
       <p style="font-size:14px;font-weight:700;color:#1a1a1a;margin:0 0 2px;font-family:inherit;">${escapeHtml(p.title)}</p>
       <p style="font-size:12px;color:#8a7a6a;margin:0;font-family:inherit;">${escapeHtml((p.tags || []).join(", "))} · ${p.status === "open" ? "Open" : "Closed"}</p>
     </div>`;
 
-  const announcementResult = a => `
+  const announcementResult = (a) => `
     <div style="padding:12px 0;border-bottom:1px solid #e8e0d4;cursor:pointer;" data-action="search-open-announcement" data-docid="${a.id}">
       <p style="font-size:14px;font-weight:700;color:#1a1a1a;margin:0 0 2px;font-family:inherit;">${escapeHtml(a.title)}</p>
       <p style="font-size:12px;color:#8a7a6a;margin:0;font-family:inherit;">${escapeHtml(a.source || "")} · ${escapeHtml(a.tag || "")}</p>
     </div>`;
 
-  return !hasQuery ? `
+  return !hasQuery
+    ? `
     <p style="font-size:13px;color:#8a7a6a;font-family:inherit;text-align:center;margin-top:40px;">Start typing to search across RVU Connect</p>
-  ` : total === 0 ? `
+  `
+    : total === 0
+      ? `
     <p style="font-size:13px;color:#8a7a6a;font-family:inherit;text-align:center;margin-top:40px;">No results for "${escapeHtml(state.searchQuery)}"</p>
-  ` : `
+  `
+      : `
     ${resultGroup("Events", matchedEvents, eventResult)}
     ${resultGroup("Clubs", matchedClubs, clubResult)}
     ${resultGroup("Projects", matchedProjects, projectResult)}
@@ -501,8 +626,16 @@ export function renderSearchOverlay() {
 }
 
 export function renderTicker() {
-  const items = ["THIS WEEK AT RVU", "AI BUILD NIGHT", "CLUB RECRUITMENT", "PROJECT COLLABORATION", "IMPORTANT UPDATES"];
-  const ticker = [...items, ...items].map((item) => `<span>${item}</span>`).join("");
+  const items = [
+    "THIS WEEK AT RVU",
+    "AI BUILD NIGHT",
+    "CLUB RECRUITMENT",
+    "PROJECT COLLABORATION",
+    "IMPORTANT UPDATES",
+  ];
+  const ticker = [...items, ...items]
+    .map((item) => `<span>${item}</span>`)
+    .join("");
   return `<div class="ticker" aria-hidden="true"><div>${ticker}</div></div>`;
 }
 
@@ -510,7 +643,7 @@ export function brandLockup() {
   const sizeClass = arguments[0] === "large" ? " large" : "";
   return `
     <div class="brand-lockup${sizeClass}">
-      <img class="brand-logo" src="./assets/rv-university-logo-gold.png" alt="RV University" />
+      <img class="brand-logo" src="./assets/RV University Gold Crest Logo.png" alt="RV University" />
     </div>
   `;
 }
@@ -525,34 +658,54 @@ export function navButtons(withIcons) {
   ];
   let pendingCount = 0;
   if (isSuperAdmin()) {
-    pendingCount = state.hostRequests.filter(r => r.status === "pending").length;
+    pendingCount = state.hostRequests.filter(
+      (r) => r.status === "pending",
+    ).length;
   } else if (isClubCore() && state.host.approved) {
-    const activeClubIds = (state.host.clubAccesses || []).map(a => a.club.id || a.club.slug);
-    pendingCount = state.hostRequests.filter(r => r.type === "clubCore" && r.status === "pending" && activeClubIds.includes(r.clubId)).length;
+    const activeClubIds = (state.host.clubAccesses || []).map(
+      (a) => a.club.id || a.club.slug,
+    );
+    pendingCount = state.hostRequests.filter(
+      (r) =>
+        r.type === "clubCore" &&
+        r.status === "pending" &&
+        activeClubIds.includes(r.clubId),
+    ).length;
   }
-  const badge = pendingCount > 0 ? `<span style="background:#e44;color:#fff;border-radius:50%;padding:2px 6px;font-size:10px;margin-left:6px;font-weight:bold;">${pendingCount}</span>` : "";
+  const badge =
+    pendingCount > 0
+      ? `<span style="background:#e44;color:#fff;border-radius:50%;padding:2px 6px;font-size:10px;margin-left:6px;font-weight:bold;">${pendingCount}</span>`
+      : "";
 
   if (isClubCore() || isSchoolRep()) {
     items.push(["admin", `Admin${badge}`, "admin"]);
   }
   items.push(["profile", "Profile", "user"]);
-  return items.map(([route, label, iconName]) => `
+  return items
+    .map(
+      ([route, label, iconName]) => `
     <button class="${withIcons ? "nav-item" : ""} ${state.route === route ? "active" : ""}" data-route="${route}">
       ${withIcons ? icon(iconName) : ""}<span>${label}</span>
     </button>
-  `).join("");
+  `,
+    )
+    .join("");
 }
 
 export function createButton() {
   return `
     <div class="create-wrap">
       <button class="btn" data-action="toggle-create">${icon("plus")} Create</button>
-      ${state.createOpen ? `
+      ${
+        state.createOpen
+          ? `
         <div class="create-menu">
           <button data-action="create-event">Create Event</button>
           <button data-action="create-announcement">Create Announcement</button>
         </div>
-      ` : ""}
+      `
+          : ""
+      }
     </div>
   `;
 }
@@ -604,8 +757,19 @@ export function renderEmptyState(title, copy, action = "") {
 export function renderHome() {
   if (state.selectedEventId) return renderEventDetail();
   if (state.selectedProjectId) return renderProjectDetail();
-  const upcoming = events.filter((event) => !event.past).sort((a, b) => a.sort - b.sort).slice(0, 5);
-  const personalized = [...events, ...projects].filter((item) => (item.tags || []).some((tag) => state.user.interests.includes(tag) || state.user.interests.includes(tag.replace("Web", "Web Development")))).slice(0, 4);
+  const upcoming = events
+    .filter((event) => !event.past)
+    .sort((a, b) => a.sort - b.sort)
+    .slice(0, 5);
+  const personalized = [...events, ...projects]
+    .filter((item) =>
+      (item.tags || []).some(
+        (tag) =>
+          state.user.interests.includes(tag) ||
+          state.user.interests.includes(tag.replace("Web", "Web Development")),
+      ),
+    )
+    .slice(0, 4);
   const nextEvent = upcoming[0];
   return `
     <section class="page-head dashboard-head">
@@ -622,7 +786,9 @@ export function renderHome() {
     </section>
     <div class="home-layout">
       <div>
-        ${nextEvent ? `<section class="spotlight">
+        ${
+          nextEvent
+            ? `<section class="spotlight">
           <div>
             <span class="tag gold">Next up</span>
             <h2>${escapeHtml(nextEvent.title)}</h2>
@@ -632,7 +798,9 @@ export function renderHome() {
             <strong>${nextEvent.date}</strong>
             <span>${nextEvent.time || ""}</span>
           </div>
-        </section>` : `<section class="section">${renderEmptyState("No live events yet", "Published events from Firestore will appear here once approved club core or school representatives create them.")}</section>`}
+        </section>`
+            : `<section class="section">${renderEmptyState("No live events yet", "Published events from Firestore will appear here once approved club core or school representatives create them.")}</section>`
+        }
         <section class="section">
           <div class="section-title"><h2>This Week at RVU</h2><span>Soonest first</span></div>
           ${upcoming.length ? `<div class="grid event-grid">${upcoming.map(renderEventCard).join("")}</div>` : renderEmptyState("No upcoming events", "Events with status published will appear here.")}
@@ -659,9 +827,27 @@ export function renderHome() {
         <section class="section">
           <div class="section-title"><h2>My Campus</h2><span>Saved and applied</span></div>
           <div class="updates">
-            ${state.followedClubs.slice(0, 2).map((item) => `<article class="update-item"><h3>${escapeHtml(item.clubName || "Followed club")}</h3><p>Club followed for personalized updates.</p></article>`).join("")}
-            ${state.rsvps.slice(0, 2).map((item) => `<article class="update-item"><h3>${escapeHtml(item.title || "RSVP")}</h3><p>${escapeHtml(item.status || "going")} RSVP stored.</p></article>`).join("")}
-            ${state.myApplications.slice(0, 2).map((item) => `<article class="update-item"><h3>${escapeHtml(item.title || "Project application")}</h3><p>Status: ${escapeHtml(item.status || "pending")}</p></article>`).join("")}
+            ${state.followedClubs
+              .slice(0, 2)
+              .map(
+                (item) =>
+                  `<article class="update-item"><h3>${escapeHtml(item.clubName || "Followed club")}</h3><p>Club followed for personalized updates.</p></article>`,
+              )
+              .join("")}
+            ${state.rsvps
+              .slice(0, 2)
+              .map(
+                (item) =>
+                  `<article class="update-item"><h3>${escapeHtml(item.title || "RSVP")}</h3><p>${escapeHtml(item.status || "going")} RSVP stored.</p></article>`,
+              )
+              .join("")}
+            ${state.myApplications
+              .slice(0, 2)
+              .map(
+                (item) =>
+                  `<article class="update-item"><h3>${escapeHtml(item.title || "Project application")}</h3><p>Status: ${escapeHtml(item.status || "pending")}</p></article>`,
+              )
+              .join("")}
             ${!state.followedClubs.length && !state.rsvps.length && !state.myApplications.length ? renderEmptyState("No personal activity yet", "Follow clubs, RSVP to events, save content, or apply to projects.") : ""}
           </div>
         </section>
@@ -674,10 +860,12 @@ function matchesEventClub(event, clubName) {
   if (clubName === "All") return true;
   const club = clubs.find((item) => item.name === clubName);
   if (!club) return true;
-  return event.club === club.name
-    || event.host === club.name
-    || event.clubId === club.id
-    || event.clubId === club.slug;
+  return (
+    event.club === club.name ||
+    event.host === club.name ||
+    event.clubId === club.id ||
+    event.clubId === club.slug
+  );
 }
 
 function matchesEventDate(event, range) {
@@ -690,22 +878,33 @@ function matchesEventDate(event, range) {
   if (Number.isNaN(when.getTime())) return true;
   const now = Date.now();
   const days = range === "This week" ? 7 : 30;
-  return when.getTime() >= now && when.getTime() <= now + days * 24 * 60 * 60 * 1000;
+  return (
+    when.getTime() >= now && when.getTime() <= now + days * 24 * 60 * 60 * 1000
+  );
 }
 
 export function renderEvents() {
   if (state.selectedEventId) return renderEventDetail();
   const cats = platformSettings().eventCategories;
-  const typeOptions = ["All", ...(cats.length ? cats : ["Club Event", "School Event"])];
+  const typeOptions = [
+    "All",
+    ...(cats.length ? cats : ["Club Event", "School Event"]),
+  ];
   const clubOptions = ["All", ...clubs.map((club) => club.name)];
   const dateOptions = ["All upcoming", "This week", "This month"];
-  const selectedClub = clubOptions.includes(state.filters.eventClub) ? state.filters.eventClub : "All";
-  const selectedDate = dateOptions.includes(state.filters.eventDate) ? state.filters.eventDate : "All upcoming";
-  const filtered = events.filter((event) =>
-    !event.past
-    && (state.filters.eventType === "All" || event.type === state.filters.eventType)
-    && matchesEventClub(event, selectedClub)
-    && matchesEventDate(event, selectedDate)
+  const selectedClub = clubOptions.includes(state.filters.eventClub)
+    ? state.filters.eventClub
+    : "All";
+  const selectedDate = dateOptions.includes(state.filters.eventDate)
+    ? state.filters.eventDate
+    : "All upcoming";
+  const filtered = events.filter(
+    (event) =>
+      !event.past &&
+      (state.filters.eventType === "All" ||
+        event.type === state.filters.eventType) &&
+      matchesEventClub(event, selectedClub) &&
+      matchesEventDate(event, selectedDate),
   );
   const upcoming = filtered.sort((a, b) => a.sort - b.sort);
   return `
@@ -728,7 +927,7 @@ export function renderEvents() {
 }
 
 export function renderEventDetail() {
-  const event = events.find(e => e.id === state.selectedEventId);
+  const event = events.find((e) => e.id === state.selectedEventId);
   if (!event) {
     state.selectedEventId = null;
     return renderEvents();
@@ -748,10 +947,14 @@ export function renderEventDetail() {
         cursor:pointer;padding:20px 20px 16px;
       " data-action="close-event-detail">← All Events</button>
 
-      ${event.posterUrl && safeUrl(event.posterUrl) ? `
+      ${
+        event.posterUrl && safeUrl(event.posterUrl)
+          ? `
         <div style="width:100%;height:260px;overflow:hidden;margin-bottom:0;">
           <img src="${safeUrl(event.posterUrl)}" style="width:100%;height:100%;object-fit:cover;" alt="${escapeHtml(event.title)}" />
-        </div>` : ""}
+        </div>`
+          : ""
+      }
 
       <div style="padding:24px 20px;">
 
@@ -765,8 +968,12 @@ export function renderEventDetail() {
 
         <p style="font-size:13px;font-weight:700;color:#D7AC54;margin:0 0 20px;font-family:inherit;text-transform:uppercase;letter-spacing:0.05em;">${escapeHtml(event.host || event.club || "")}</p>
 
-        ${(event.collaboratingClubs || []).length ? `
-          <p style="font-size:12px;color:#8a7a6a;margin:-14px 0 20px;font-family:inherit;">with ${event.collaboratingClubs.map(c => escapeHtml(c)).join(", ")}</p>` : ""}
+        ${
+          (event.collaboratingClubs || []).length
+            ? `
+          <p style="font-size:12px;color:#8a7a6a;margin:-14px 0 20px;font-family:inherit;">with ${event.collaboratingClubs.map((c) => escapeHtml(c)).join(", ")}</p>`
+            : ""
+        }
 
         <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px;padding:16px;background:#f0ece4;border-left:3px solid #D7AC54;">
           <div style="display:flex;align-items:center;gap:10px;">
@@ -777,39 +984,62 @@ export function renderEventDetail() {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8a7a6a" stroke-width="2"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
             <span style="font-size:13px;color:#1a1a1a;font-family:inherit;">${escapeHtml(event.location || "")}</span>
           </div>
-          ${event.registrationDeadline ? `
+          ${
+            event.registrationDeadline
+              ? `
           <div style="display:flex;align-items:center;gap:10px;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8a7a6a" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
             <span style="font-size:13px;color:#1a1a1a;font-family:inherit;">Registration reminder: ${escapeHtml(event.registrationDeadline)}</span>
-          </div>` : ""}
+          </div>`
+              : ""
+          }
         </div>
 
         <div style="height:1px;background:#d8cfc4;margin-bottom:20px;"></div>
 
         <p style="font-size:15px;color:#3a3a3a;line-height:1.8;font-family:inherit;margin-bottom:28px;">${escapeHtml(event.description || "")}</p>
 
-        ${!isPast && !isCancelled ? `
+        ${
+          !isPast && !isCancelled
+            ? `
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;">
             ${event.link && safeUrl(event.link) ? `<a href="${safeUrl(event.link)}" target="_blank" rel="noopener noreferrer" style="background:#D7AC54;color:#1a1a1a;border:none;padding:12px 24px;font-size:12px;font-weight:800;font-family:inherit;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">Join →</a>` : ""}
             <button style="background:none;border:1.5px solid #c8b89a;color:#5a4a3a;padding:12px 18px;font-size:12px;font-weight:700;font-family:inherit;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;" data-action="${isItemSaved(event.id, "event") ? "unsave-item" : "save-item"}" data-docid="${event.id}" data-kind="event" data-title="${escapeHtml(event.title)}">${isItemSaved(event.id, "event") ? "Saved" : "Save"}</button>
-            ${canManageEvent(event) ? `
+            ${
+              canManageEvent(event)
+                ? `
               <button style="background:none;border:1.5px solid #c8b89a;color:#5a4a3a;padding:12px 18px;font-size:12px;font-weight:700;font-family:inherit;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;" data-action="open-edit-event" data-docid="${event.id}">Edit</button>
               <button style="background:none;border:1.5px solid #c8b89a;color:#a09080;padding:12px 18px;font-size:12px;font-weight:700;font-family:inherit;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;" data-action="${event.hostType === "school" ? "delete-school-event" : "delete-club-event"}" data-docid="${event.id}">Delete</button>
-            ` : ""}
-          </div>` : ""}
+            `
+                : ""
+            }
+          </div>`
+            : ""
+        }
 
         <div style="height:1px;background:#d8cfc4;margin-bottom:20px;"></div>
 
         <div>
           <p style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#8a7a6a;margin:0 0 14px;font-family:inherit;">More from ${escapeHtml(event.host || event.club || "this host")}</p>
-          ${events
-      .filter(e => (e.host === event.host || e.club === event.club) && e.id !== event.id && !e.past)
-      .slice(0, 2)
-      .map(e => `
+          ${
+            events
+              .filter(
+                (e) =>
+                  (e.host === event.host || e.club === event.club) &&
+                  e.id !== event.id &&
+                  !e.past,
+              )
+              .slice(0, 2)
+              .map(
+                (e) => `
               <div style="padding:12px 0;border-bottom:1px solid #e8e0d4;cursor:pointer;" data-action="open-event-detail" data-docid="${e.id}">
                 <p style="font-size:13px;font-weight:700;color:#1a1a1a;margin:0 0 3px;font-family:inherit;">${escapeHtml(e.title)}</p>
                 <p style="font-size:12px;color:#8a7a6a;margin:0;font-family:inherit;">${escapeHtml(e.date || "")} · ${escapeHtml(e.location || "")}</p>
-              </div>`).join("") || `<p style="font-size:13px;color:#8a7a6a;font-family:inherit;">No other events from this host.</p>`}
+              </div>`,
+              )
+              .join("") ||
+            `<p style="font-size:13px;color:#8a7a6a;font-family:inherit;">No other events from this host.</p>`
+          }
         </div>
 
       </div>
@@ -820,9 +1050,12 @@ export function renderEventDetail() {
 export function renderClubs() {
   if (state.selectedEventId) return renderEventDetail();
   if (state.selectedClubSlug) return renderClubDetail();
-  const filtered = clubs.filter((club) =>
-    (state.filters.clubCategory === "All" || club.category === state.filters.clubCategory) &&
-    (state.filters.clubSchool === "All" || club.school === state.filters.clubSchool)
+  const filtered = clubs.filter(
+    (club) =>
+      (state.filters.clubCategory === "All" ||
+        club.category === state.filters.clubCategory) &&
+      (state.filters.clubSchool === "All" ||
+        club.school === state.filters.clubSchool),
   );
   return `
     <section class="page-head">
@@ -839,16 +1072,28 @@ export function renderClubs() {
 }
 
 export function renderClubDetail() {
-  const club = clubs.find((item) => item.slug === state.selectedClubSlug) || clubs[0];
+  const club =
+    clubs.find((item) => item.slug === state.selectedClubSlug) || clubs[0];
   if (!club) return renderClubs();
-  const clubEvents = events.filter((event) => event.club === club.name || event.host === club.name || event.clubId === club.id || event.clubId === club.slug);
+  const clubEvents = events.filter(
+    (event) =>
+      event.club === club.name ||
+      event.host === club.name ||
+      event.clubId === club.id ||
+      event.clubId === club.slug,
+  );
   const joinHref = club.join || club.joinLink || "";
   const canEdit = canManageClub(club);
   const following = isFollowingClub(club.id || club.slug);
   const coreMembers = state.clubCoreMembers || [];
   const myEmail = (state.authUser?.email || "").trim().toLowerCase();
   const identity = clubIdentity(club);
-  const heroClass = ["club-detail-hero", identity.bannerUrl ? "has-wallpaper" : ""].filter(Boolean).join(" ");
+  const heroClass = [
+    "club-detail-hero",
+    identity.bannerUrl ? "has-wallpaper" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
   const accentAttr = identity.accent ? ` data-accent="${identity.accent}"` : "";
   return `
     <section class="${heroClass}"${accentAttr}>
@@ -870,11 +1115,15 @@ export function renderClubDetail() {
       </div>
       <div class="project-actions" style="margin-top:16px;flex-wrap:wrap;">
         <button class="btn ${following ? "secondary" : "gold"}" data-action="${following ? "unfollow-club" : "follow-club"}" data-docid="${club.id || club.slug}" data-title="${escapeHtml(club.name)}">${following ? "Following" : "Follow"}</button>
-        ${canEdit ? `
+        ${
+          canEdit
+            ? `
           <button class="btn gold" data-action="open-edit-club" data-docid="${club.id || club.slug}">Edit club profile</button>
           <button class="btn secondary" data-action="toggle-registration" data-club="${club.slug || club.id}">${club.registrationOpen ? "Close registration" : "Open registration"}</button>
           <button class="btn secondary" data-action="leave-club-core" data-docid="${club.id || club.slug}" data-title="${escapeHtml(club.name)}">Leave club core</button>
-        ` : ""}
+        `
+            : ""
+        }
       </div>
     </section>
     <section class="club-detail-layout"${accentAttr}>
@@ -899,9 +1148,11 @@ export function renderClubDetail() {
         <span class="section-num">Join</span>
         <h2>${club.registrationOpen ? "Registrations are open" : "Registrations are closed"}</h2>
         <p>${club.registrationOpen ? "This club is currently accepting new members through its registration form." : "This club is visible on RVU Connect, but it is not accepting new registrations right now."}</p>
-        ${club.registrationOpen && joinHref && safeUrl(joinHref)
-          ? `<button class="btn gold" data-action="open-external-link" data-url="${safeUrl(joinHref)}">Open join link</button>`
-          : `<span class="tag">${club.registrationOpen ? "No valid join link configured" : "No active join link"}</span>`}
+        ${
+          club.registrationOpen && joinHref && safeUrl(joinHref)
+            ? `<button class="btn gold" data-action="open-external-link" data-url="${safeUrl(joinHref)}">Open join link</button>`
+            : `<span class="tag">${club.registrationOpen ? "No valid join link configured" : "No active join link"}</span>`
+        }
       </article>
     </section>
     <section class="section">
@@ -909,23 +1160,30 @@ export function renderClubDetail() {
         <h2>Club core team</h2>
         <span>${state._clubCoreMembersLoading ? "Loading…" : `${coreMembers.length} member${coreMembers.length === 1 ? "" : "s"}`}</span>
       </div>
-      ${state._clubCoreMembersLoading
-        ? `<p style="font-size:13px;color:#8a7a6a;">Loading core members…</p>`
-        : coreMembers.length
-          ? `<div class="admin-board">${coreMembers.map((m) => {
-            const email = (m.email || m.id || "").trim().toLowerCase();
-            const isSelf = email && email === myEmail;
-            const canRemove = canEdit && email && !isSelf && !m.permanent;
-            return `
+      ${
+        state._clubCoreMembersLoading
+          ? `<p style="font-size:13px;color:#8a7a6a;">Loading core members…</p>`
+          : coreMembers.length
+            ? `<div class="admin-board">${coreMembers
+                .map((m) => {
+                  const email = (m.email || m.id || "").trim().toLowerCase();
+                  const isSelf = email && email === myEmail;
+                  const canRemove = canEdit && email && !isSelf && !m.permanent;
+                  return `
               <div class="admin-row">
                 <div>
                   <strong>${escapeHtml(m.name || email || "Core member")}</strong>
                   <span>${escapeHtml(email)}${m.role ? ` · ${escapeHtml(m.role)}` : ""}${m.permanent ? " · Founder" : ""}</span>
                 </div>
-                ${canRemove ? `<div class="admin-row-actions"><button data-action="remove-club-core-member" data-club="${club.id || club.slug}" data-email="${escapeHtml(email)}" data-name="${escapeHtml(m.name || email)}">Remove</button></div>` : (isSelf ? `<span class="tag">You</span>` : "")}
+                ${canRemove ? `<div class="admin-row-actions"><button data-action="remove-club-core-member" data-club="${club.id || club.slug}" data-email="${escapeHtml(email)}" data-name="${escapeHtml(m.name || email)}">Remove</button></div>` : isSelf ? `<span class="tag">You</span>` : ""}
               </div>`;
-          }).join("")}</div>`
-          : renderEmptyState("No core members listed", "Approved club core members will appear here.")}
+                })
+                .join("")}</div>`
+            : renderEmptyState(
+                "No core members listed",
+                "Approved club core members will appear here.",
+              )
+      }
     </section>
     <section class="section">
       <div class="section-title"><h2>Club events</h2><span>${clubEvents.length ? "Hosted by club" : "No events yet"}</span></div>
@@ -936,7 +1194,9 @@ export function renderClubDetail() {
 }
 
 export function renderEditClubModal(club = {}) {
-  const highlightsText = Array.isArray(club.highlights) ? club.highlights.join("\n") : (club.highlights || "");
+  const highlightsText = Array.isArray(club.highlights)
+    ? club.highlights.join("\n")
+    : club.highlights || "";
   const draft = state.editClubIdentity || {};
   const logoPreview = safeUrl(draft.logoUrl || club.logoUrl);
   const bannerPreview = safeUrl(draft.bannerUrl || club.bannerUrl);
@@ -979,10 +1239,14 @@ export function renderEditClubModal(club = {}) {
             <p style="font-size:10px;color:#8a7a6a;margin:-8px 0 16px;font-family:inherit;">Free-plan mode: paste direct public image links. Clear a field to remove that image. Images are not stored in Firebase.</p>
             <label style="display:block;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#8a7a6a;margin-bottom:8px;font-family:inherit;">Accent</label>
             <div class="club-accent-swatches">
-              ${swatches.map((swatch) => {
-                const active = (swatch.id === "default" && !accent) || swatch.id === accent;
-                return `<button type="button" class="club-accent-swatch${active ? " active" : ""}" data-action="set-club-accent" data-accent="${swatch.id}" title="${escapeHtml(swatch.label)}" style="background:${swatch.color};">${escapeHtml(swatch.label)}</button>`;
-              }).join("")}
+              ${swatches
+                .map((swatch) => {
+                  const active =
+                    (swatch.id === "default" && !accent) ||
+                    swatch.id === accent;
+                  return `<button type="button" class="club-accent-swatch${active ? " active" : ""}" data-action="set-club-accent" data-accent="${swatch.id}" title="${escapeHtml(swatch.label)}" style="background:${swatch.color};">${escapeHtml(swatch.label)}</button>`;
+                })
+                .join("")}
             </div>
             <p style="font-size:10px;color:#8a7a6a;margin:8px 0 0;font-family:inherit;">Campus default keeps the current look. Accent tints this club’s tile and page only.</p>
           </div>
@@ -1019,7 +1283,8 @@ export function renderEditClubModal(club = {}) {
 }
 
 export function renderEditAnnouncementModal() {
-  const item = announcements.find(a => a.id === state.editAnnouncementId) || {};
+  const item =
+    announcements.find((a) => a.id === state.editAnnouncementId) || {};
   return `
     <div style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0 80px;">
       <div style="background:#f5f2ec;width:100%;max-width:600px;margin:0 16px;">
@@ -1036,15 +1301,19 @@ export function renderEditAnnouncementModal() {
             <label style="display:block;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#8a7a6a;margin-bottom:8px;font-family:inherit;">Description</label>
             <textarea id="ea-description" style="width:100%;border:1.5px solid #c8b89a;background:transparent;padding:10px 12px;font-size:14px;font-family:inherit;color:#1a1a1a;outline:none;resize:vertical;min-height:100px;">${escapeHtml(item.description || "")}</textarea>
           </div>
-          ${isSchoolRep() || (item.sourceType === "school" || item.type === "School") ? modalSelectField("ea-host-school", "School", schools, item.schoolId || item.schoolName || item.source || state.host.school) : ""}
+          ${isSchoolRep() || item.sourceType === "school" || item.type === "School" ? modalSelectField("ea-host-school", "School", schools, item.schoolId || item.schoolName || item.source || state.host.school) : ""}
           <div style="margin-bottom:16px;">
             <label style="display:block;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#8a7a6a;margin-bottom:8px;font-family:inherit;">Tag</label>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
-              ${platformSettings().announcementTags.map((t) => `
+              ${platformSettings()
+                .announcementTags.map(
+                  (t) => `
                 <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;font-family:inherit;color:#1a1a1a;">
                   <input type="radio" name="ea-tag" value="${escapeHtml(t)}" ${(item.tag || "Notice") === t ? "checked" : ""} style="accent-color:#D7AC54;" />
                   ${escapeHtml(t)}
-                </label>`).join("")}
+                </label>`,
+                )
+                .join("")}
             </div>
           </div>
           <div style="margin-bottom:24px;">
@@ -1125,11 +1394,18 @@ export function renderProjects() {
   const tags = unique(projects.flatMap((project) => project.tags || []));
   const tagOptions = ["All", ...tags];
   const statusOptions = ["All", "Open", "Closed"];
-  const selectedTag = tagOptions.includes(state.filters.projectTag) ? state.filters.projectTag : "All";
-  const selectedStatus = statusOptions.includes(state.filters.projectStatus) ? state.filters.projectStatus : "All";
-  const filtered = projects.filter((project) =>
-    (selectedTag === "All" || (project.tags || []).includes(selectedTag))
-    && (selectedStatus === "All" || String(project.status || "").toLowerCase() === selectedStatus.toLowerCase())
+  const selectedTag = tagOptions.includes(state.filters.projectTag)
+    ? state.filters.projectTag
+    : "All";
+  const selectedStatus = statusOptions.includes(state.filters.projectStatus)
+    ? state.filters.projectStatus
+    : "All";
+  const filtered = projects.filter(
+    (project) =>
+      (selectedTag === "All" || (project.tags || []).includes(selectedTag)) &&
+      (selectedStatus === "All" ||
+        String(project.status || "").toLowerCase() ===
+          selectedStatus.toLowerCase()),
   );
   return `
     <section class="page-head" style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;">
@@ -1151,7 +1427,7 @@ export function renderProjects() {
 }
 
 export function renderProjectDetail() {
-  const project = projects.find(p => p.id === state.selectedProjectId);
+  const project = projects.find((p) => p.id === state.selectedProjectId);
   if (!project) {
     state.selectedProjectId = null;
     return renderProjects();
@@ -1189,53 +1465,77 @@ export function renderProjectDetail() {
 
         <p style="font-size:15px;color:#3a3a3a;line-height:1.85;font-family:inherit;margin-bottom:24px;white-space:pre-line;">${escapeHtml(project.description || "")}</p>
 
-        ${(project.skills || []).length ? `
+        ${
+          (project.skills || []).length
+            ? `
           <div style="margin-bottom:16px;">
             <p style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#8a7a6a;margin:0 0 10px;font-family:inherit;">Skills Needed</p>
             <div style="display:flex;flex-wrap:wrap;gap:8px;">
-              ${project.skills.map(s => `<span style="border:1.5px solid #c8b89a;padding:4px 12px;font-size:12px;font-weight:600;color:#1a1a1a;font-family:inherit;text-transform:uppercase;letter-spacing:0.05em;">${escapeHtml(s)}</span>`).join("")}
+              ${project.skills.map((s) => `<span style="border:1.5px solid #c8b89a;padding:4px 12px;font-size:12px;font-weight:600;color:#1a1a1a;font-family:inherit;text-transform:uppercase;letter-spacing:0.05em;">${escapeHtml(s)}</span>`).join("")}
             </div>
-          </div>` : ""}
+          </div>`
+            : ""
+        }
 
-        ${(project.tags || []).length ? `
+        ${
+          (project.tags || []).length
+            ? `
           <div style="margin-bottom:24px;">
             <p style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#8a7a6a;margin:0 0 10px;font-family:inherit;">Tags</p>
             <div style="display:flex;flex-wrap:wrap;gap:8px;">
-              ${project.tags.map(t => `<span style="background:#D7AC5418;color:#8a6a2a;padding:4px 12px;font-size:12px;font-weight:600;font-family:inherit;">${escapeHtml(t)}</span>`).join("")}
+              ${project.tags.map((t) => `<span style="background:#D7AC5418;color:#8a6a2a;padding:4px 12px;font-size:12px;font-weight:600;font-family:inherit;">${escapeHtml(t)}</span>`).join("")}
             </div>
-          </div>` : ""}
+          </div>`
+            : ""
+        }
 
         <div style="background:#f0ece4;border-left:3px solid #D7AC54;padding:16px;margin-bottom:24px;">
           <p style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#8a7a6a;margin:0 0 10px;font-family:inherit;">Posted By</p>
           <p style="font-size:14px;font-weight:700;color:#1a1a1a;margin:0 0 4px;font-family:inherit;">${escapeHtml(project.postedByName || project.postedBy || "Student")}</p>
-          ${isLoggedIn ? `
+          ${
+            isLoggedIn
+              ? `
             <p style="font-size:13px;color:#5a4a3a;margin:0 0 4px;font-family:inherit;">${escapeHtml(project.postedBy || "")}</p>
             ${project.contactPhone ? `<p style="font-size:13px;color:#5a4a3a;margin:0;font-family:inherit;">${escapeHtml(project.contactPhone)}</p>` : ""}
-          ` : `<p style="font-size:12px;color:#8a7a6a;margin:0;font-family:inherit;">Sign in to see contact details.</p>`}
+          `
+              : `<p style="font-size:12px;color:#8a7a6a;margin:0;font-family:inherit;">Sign in to see contact details.</p>`
+          }
           <p style="font-size:12px;color:#5a4a3a;margin:12px 0 0;font-family:inherit;line-height:1.5;">Reach out to this student by email, phone, or their external link for more details about joining the project.</p>
         </div>
 
-        ${isOpen ? `
+        ${
+          isOpen
+            ? `
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
-            ${project.applicationLink && safeUrl(project.applicationLink) ? `
+            ${
+              project.applicationLink && safeUrl(project.applicationLink)
+                ? `
               <a href="${safeUrl(project.applicationLink)}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;background:#D7AC54;color:#1a1a1a;padding:12px 28px;font-size:12px;font-weight:800;font-family:inherit;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;">Apply / Join Project ↗</a>
-            ` : `
+            `
+                : `
               <div style="background:#f0ece4;border-left:3px solid #D7AC54;padding:12px 16px;flex:1;">
                 <p style="font-size:13px;color:#5a4a3a;margin:0;font-family:inherit;font-weight:600;">Contact the owner directly to collaborate.</p>
               </div>
-            `}
+            `
+            }
             <button style="background:none;border:1.5px solid #c8b89a;color:#5a4a3a;padding:12px 18px;font-size:12px;font-weight:700;font-family:inherit;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;" data-action="${isItemSaved(project.id, "project") ? "unsave-item" : "save-item"}" data-docid="${project.id}" data-kind="project" data-title="${escapeHtml(project.title)}">${isItemSaved(project.id, "project") ? "Saved" : "Save"}</button>
-          </div>` : `
+          </div>`
+            : `
           <div style="background:#f0ece4;padding:12px 16px;margin-bottom:16px;border-left:3px solid #c8b89a;">
             <p style="font-size:13px;color:#8a7a6a;margin:0;font-family:inherit;font-weight:600;">This project is no longer accepting collaborators.</p>
-          </div>`}
+          </div>`
+        }
 
-        ${isMyProject ? `
+        ${
+          isMyProject
+            ? `
           <div style="display:flex;gap:8px;padding-top:16px;border-top:1px solid #e8e0d4;flex-wrap:wrap;">
             <button style="background:#D7AC54;border:1.5px solid #D7AC54;padding:8px 16px;font-size:11px;font-weight:800;color:#1a1a1a;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:0.05em;" data-action="open-edit-project" data-docid="${project.id}">Edit Project</button>
             <button style="background:none;border:1.5px solid #c8b89a;padding:8px 16px;font-size:11px;font-weight:700;color:#5a4a3a;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:0.05em;" data-action="toggle-project-status" data-docid="${project.id}" data-status="${escapeHtml(project.status)}">${isOpen ? "Close Project" : "Reopen"}</button>
             <button style="background:none;border:1.5px solid #c8b89a;padding:8px 16px;font-size:11px;font-weight:700;color:#a09080;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:0.05em;" data-action="delete-own-project" data-docid="${project.id}" data-title="${escapeHtml(project.title)}">Delete</button>
-          </div>` : ""}
+          </div>`
+            : ""
+        }
 
       </div>
       ${state.editProjectOpen && state.editProjectId === project.id ? renderEditProjectModal(project) : ""}
@@ -1249,7 +1549,12 @@ export function isProjectOwner(project) {
   if (uid && project.ownerId) return project.ownerId === uid;
   if (uid && project.createdBy) return project.createdBy === uid;
   const email = (state.authUser?.email || "").trim().toLowerCase();
-  return Boolean(email) && String(project.postedBy || "").trim().toLowerCase() === email;
+  return (
+    Boolean(email) &&
+    String(project.postedBy || "")
+      .trim()
+      .toLowerCase() === email
+  );
 }
 
 export function renderEditProjectModal(project) {
@@ -1313,10 +1618,15 @@ export function renderEditProjectModal(project) {
 export function renderAnnouncements() {
   if (state.selectedAnnouncementId) return renderAnnouncementDetail();
   const tagOptions = ["All", ...platformSettings().announcementTags];
-  const selectedTag = tagOptions.includes(state.filters.announcementTag) ? state.filters.announcementTag : "All";
-  const filtered = announcements.filter((item) =>
-    (state.filters.announcementType === "All" || item.type === state.filters.announcementType)
-    && (selectedTag === "All" || String(item.tag || "").toLowerCase() === selectedTag.toLowerCase())
+  const selectedTag = tagOptions.includes(state.filters.announcementTag)
+    ? state.filters.announcementTag
+    : "All";
+  const filtered = announcements.filter(
+    (item) =>
+      (state.filters.announcementType === "All" ||
+        item.type === state.filters.announcementType) &&
+      (selectedTag === "All" ||
+        String(item.tag || "").toLowerCase() === selectedTag.toLowerCase()),
   );
   return `
     <section class="page-head">
@@ -1334,7 +1644,7 @@ export function renderAnnouncements() {
 }
 
 export function renderAnnouncementDetail() {
-  const item = announcements.find(a => a.id === state.selectedAnnouncementId);
+  const item = announcements.find((a) => a.id === state.selectedAnnouncementId);
   if (!item) {
     state.selectedAnnouncementId = null;
     return renderAnnouncements();
@@ -1361,7 +1671,9 @@ export function renderAnnouncementDetail() {
           font-family:inherit;text-transform:uppercase;letter-spacing:0.08em;
           cursor:pointer;display:inline-flex;align-items:center;gap:6px;
         " data-action="close-announcement-detail">← Announcements</button>
-        ${canEdit ? `
+        ${
+          canEdit
+            ? `
         <div style="display:flex;gap:8px;">
           <button style="
             background:none;border:1.5px solid #c8b89a;
@@ -1375,7 +1687,9 @@ export function renderAnnouncementDetail() {
             font-size:11px;font-weight:700;font-family:inherit;
             letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;
           " data-action="${item.sourceType === "school" ? "delete-school-announcement" : "delete-club-announcement"}" data-docid="${item.id}">Delete</button>
-        </div>` : ""}
+        </div>`
+            : ""
+        }
       </div>
 
       <div style="padding:24px 20px;">
@@ -1395,19 +1709,27 @@ export function renderAnnouncementDetail() {
 
         <div style="height:1px;background:#d8cfc4;margin-bottom:24px;"></div>
 
-        ${item.imageUrl && safeUrl(item.imageUrl) ? `
+        ${
+          item.imageUrl && safeUrl(item.imageUrl)
+            ? `
           <div style="margin-bottom:24px;">
             <img src="${safeUrl(item.imageUrl)}" style="width:100%;max-height:400px;object-fit:cover;" alt="Announcement image" />
-          </div>` : ""}
+          </div>`
+            : ""
+        }
 
         <p style="font-size:15px;color:#3a3a3a;line-height:1.85;font-family:inherit;margin-bottom:28px;white-space:pre-line;">${escapeHtml(item.description || "")}</p>
 
         <div style="height:1px;background:#d8cfc4;margin-bottom:16px;"></div>
 
-        ${item.link && safeUrl(item.link) ? `
+        ${
+          item.link && safeUrl(item.link)
+            ? `
           <div style="margin-bottom:24px;">
             <a href="${safeUrl(item.link)}" target="_blank" rel="noopener noreferrer" style="background:#D7AC54;color:#1a1a1a;border:none;padding:12px 24px;font-size:12px;font-weight:800;font-family:inherit;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">Join / Learn More →</a>
-          </div>` : ""}
+          </div>`
+            : ""
+        }
 
         <div style="display:flex;align-items:center;justify-content:space-between;">
 
@@ -1421,8 +1743,18 @@ export function renderAnnouncementDetail() {
 }
 
 export function renderProfile() {
-  const initials = (state.user.name || "?").split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase();
-  const roleClass = state.role === "club-core" ? "club-core" : state.role === "school-rep" ? "school-rep" : "student";
+  const initials = (state.user.name || "?")
+    .split(" ")
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+  const roleClass =
+    state.role === "club-core"
+      ? "club-core"
+      : state.role === "school-rep"
+        ? "school-rep"
+        : "student";
   const roleText = roleLabel();
 
   const roleBadge = `<span style="
@@ -1435,7 +1767,7 @@ export function renderProfile() {
     font-family:inherit;
   ">${roleText}</span>`;
 
-  const chip = text => `<span style="
+  const chip = (text) => `<span style="
     display:inline-flex;align-items:center;
     background:transparent;
     border:1.5px solid var(--gold,#D7AC54);
@@ -1474,63 +1806,92 @@ export function renderProfile() {
     : `<p style="font-size:13px;color:#8a7a6a;margin:0;">No interests selected yet.</p>`;
 
   const followContent = state.followedClubs.length
-    ? state.followedClubs.map(c => `
+    ? state.followedClubs
+        .map(
+          (c) => `
       <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #e8e0d4;">
         <span style="font-size:14px;font-weight:600;color:#1a1a1a;font-family:inherit;">${escapeHtml(c.clubName || "Club")}</span>
         <div style="display:flex;gap:8px;">
           <button style="background:none;border:1.5px solid #c8b89a;padding:4px 12px;font-size:12px;color:#5a4a3a;cursor:pointer;font-family:inherit;" data-action="open-club" data-club="${c.clubId || ""}">View →</button>
           <button style="background:none;border:1.5px solid #c8b89a;padding:4px 12px;font-size:12px;color:#a09080;cursor:pointer;font-family:inherit;" data-action="unfollow-club" data-docid="${c.clubId || ""}" data-title="${escapeHtml(c.clubName || "")}">Unfollow</button>
         </div>
-      </div>`).join("")
+      </div>`,
+        )
+        .join("")
     : `<p style="font-size:13px;color:#8a7a6a;margin:0;padding:8px 0;">No clubs followed yet.</p>`;
 
   const rsvpContent = state.rsvps.length
-    ? state.rsvps.map(r => listRow(
-      `<div>
+    ? state.rsvps
+        .map((r) =>
+          listRow(
+            `<div>
           <p style="font-size:14px;font-weight:600;color:#1a1a1a;margin:0 0 3px;font-family:inherit;">${escapeHtml(r.title || "Event")}</p>
         </div>`,
-      badge(r.status || "going", r.status === "interested" ? "#D7AC54" : "#2a7a4a")
-    )).join("")
+            badge(
+              r.status || "going",
+              r.status === "interested" ? "#D7AC54" : "#2a7a4a",
+            ),
+          ),
+        )
+        .join("")
     : `<p style="font-size:13px;color:#8a7a6a;margin:0;padding:8px 0;">No RSVPs yet.</p>`;
 
-
   const clubAppsContent = state.clubApplications.length
-    ? state.clubApplications.map(a => {
-      const club = clubs.find(c => c.id === a.clubId) || { name: "Unknown Club" };
-      const b = badge(a.status || "pending", a.status === "approved" ? "#2a7a4a" : a.status === "rejected" ? "#dc2626" : "#8a7a6a");
-      const withdrawBtn = a.status === "pending"
-        ? `<button style="background:none;border:none;color:#dc2626;font-size:11px;font-weight:700;text-transform:uppercase;cursor:pointer;margin-left:12px;font-family:inherit;" data-action="withdraw-club-application" data-docid="${a.id}">Withdraw</button>`
-        : "";
-      return listRow(
-        `<p style="font-size:14px;font-weight:600;color:#1a1a1a;margin:0;font-family:inherit;">${escapeHtml(club.name)}</p>`,
-        `<div style="display:flex;align-items:center;">${b}${withdrawBtn}</div>`
-      );
-    }).join("")
+    ? state.clubApplications
+        .map((a) => {
+          const club = clubs.find((c) => c.id === a.clubId) || {
+            name: "Unknown Club",
+          };
+          const b = badge(
+            a.status || "pending",
+            a.status === "approved"
+              ? "#2a7a4a"
+              : a.status === "rejected"
+                ? "#dc2626"
+                : "#8a7a6a",
+          );
+          const withdrawBtn =
+            a.status === "pending"
+              ? `<button style="background:none;border:none;color:#dc2626;font-size:11px;font-weight:700;text-transform:uppercase;cursor:pointer;margin-left:12px;font-family:inherit;" data-action="withdraw-club-application" data-docid="${a.id}">Withdraw</button>`
+              : "";
+          return listRow(
+            `<p style="font-size:14px;font-weight:600;color:#1a1a1a;margin:0;font-family:inherit;">${escapeHtml(club.name)}</p>`,
+            `<div style="display:flex;align-items:center;">${b}${withdrawBtn}</div>`,
+          );
+        })
+        .join("")
     : `<p style="font-size:13px;color:#8a7a6a;margin:0;padding:8px 0;">No club applications yet.</p>`;
 
   const savedContent = state.savedItems.length
-    ? state.savedItems.map(s => {
-      const typeColor = s.type === "event" ? "#D7AC54" : s.type === "project" ? "#6a5acd" : "#3a8a9a";
-      return listRow(
-        `<div style="display:flex;align-items:center;gap:10px;">
+    ? state.savedItems
+        .map((s) => {
+          const typeColor =
+            s.type === "event"
+              ? "#D7AC54"
+              : s.type === "project"
+                ? "#6a5acd"
+                : "#3a8a9a";
+          return listRow(
+            `<div style="display:flex;align-items:center;gap:10px;">
             ${badge(s.type || "item", typeColor)}
             <p style="font-size:14px;font-weight:500;color:#1a1a1a;margin:0;font-family:inherit;">${escapeHtml(s.title || "Saved")}</p>
           </div>`,
-        `<div style="display:flex;gap:8px;">
+            `<div style="display:flex;gap:8px;">
           <button style="background:none;border:1.5px solid #c8b89a;border-radius:0;padding:3px 12px;font-size:12px;color:#5a4a3a;cursor:pointer;font-family:inherit;" data-action="open-${s.type}-detail" data-docid="${s.itemId || ""}">View →</button>
           <button style="background:none;border:1.5px solid #c8b89a;border-radius:0;padding:3px 12px;font-size:12px;color:#a09080;cursor:pointer;font-family:inherit;" data-action="unsave-item" data-docid="${s.itemId || ""}" data-kind="${s.type || "item"}" data-title="${escapeHtml(s.title || "")}">Unsave</button>
-        </div>`
-      );
-    }).join("")
+        </div>`,
+          );
+        })
+        .join("")
     : `<p style="font-size:13px;color:#8a7a6a;margin:0;padding:8px 0;">Nothing saved yet.</p>`;
 
   const recentActivity = [
-    ...state.rsvps.slice(0, 2).map(r => ({
+    ...state.rsvps.slice(0, 2).map((r) => ({
       type: "rsvp",
       text: `You RSVPed to ${escapeHtml(r.title || "an event")}`,
       status: r.status || "going",
     })),
-    ...state.followedClubs.slice(0, 1).map(c => ({
+    ...state.followedClubs.slice(0, 1).map((c) => ({
       type: "follow",
       text: `You follow ${c.clubName || "a club"}`,
       status: "following",
@@ -1584,10 +1945,17 @@ export function renderProfile() {
           " data-action="edit-interests">Edit Interests</button>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          ${((state.host.clubAccesses || []).length + state.clubApplications.filter(a => a.status === 'pending').length) < 5 ? `
+          ${
+            (state.host.clubAccesses || []).length +
+              state.clubApplications.filter((a) => a.status === "pending")
+                .length <
+            5
+              ? `
             <button style="background:none;border:1.5px solid #D7AC54;color:#8a6a2a;padding:6px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:0.05em;" data-action="open-club-apply-modal">Apply to existing club</button>
             <button style="background:none;border:1.5px solid #D7AC54;color:#8a6a2a;padding:6px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:0.05em;" data-action="create-new-club-onboarding">Create new club</button>
-          ` : ""}
+          `
+              : ""
+          }
           <button style="background:none;border:1.5px solid #D7AC54;color:#8a6a2a;padding:6px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:0.05em;" data-action="start-school-rep-apply">Apply as School Rep</button>
 
         </div>
@@ -1595,9 +1963,14 @@ export function renderProfile() {
 
       <div style="height:1px;background:#d8cfc4;margin:24px 0;"></div>
 
-      ${recentActivity.length ? `
-        ${section("Recent Activity",
-    recentActivity.map(item => `
+      ${
+        recentActivity.length
+          ? `
+        ${section(
+          "Recent Activity",
+          recentActivity
+            .map(
+              (item) => `
             <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e8e0d4;">
               <p style="font-size:13px;color:#1a1a1a;margin:0;font-family:inherit;">${escapeHtml(item.text)}</p>
               <span style="
@@ -1606,8 +1979,12 @@ export function renderProfile() {
                 background:${activityColors[item.status] || "#8a7a6a"}18;
                 font-family:inherit;text-transform:uppercase;letter-spacing:0.05em;
               ">${escapeHtml(item.status)}</span>
-            </div>`).join("")
-  )}` : ""}
+            </div>`,
+            )
+            .join(""),
+        )}`
+          : ""
+      }
       ${section("My Interests", interestContent)}
       ${section("Clubs I Follow", followContent)}
       ${section("My Club Applications", clubAppsContent)}
@@ -1666,7 +2043,12 @@ export function renderProfileInterestsModal() {
         <p class="eyebrow">Edit Profile</p>
         <h2>Your Interests</h2>
         <p>Select topics that match your campus goals.</p>
-        <div class="chip-grid">${platformSettings().interestTags.map((interest) => `<button class="chip ${state.user.interests.includes(interest) ? "active" : ""}" data-interest="${interest}">${escapeHtml(interest)}</button>`).join("")}</div>
+        <div class="chip-grid">${platformSettings()
+          .interestTags.map(
+            (interest) =>
+              `<button class="chip ${state.user.interests.includes(interest) ? "active" : ""}" data-interest="${interest}">${escapeHtml(interest)}</button>`,
+          )
+          .join("")}</div>
         <div style="display:flex;gap:10px;margin-top:18px">
           <button class="btn gold" data-action="close-profile-interests">Save Interests</button>
           <button class="btn secondary" data-action="close-profile-interests">Cancel</button>
@@ -1677,9 +2059,12 @@ export function renderProfileInterestsModal() {
 }
 
 export function renderClubApplyModal() {
-  const eligible = clubs.filter(c =>
-    c.status === "approved" &&
-    !state.clubApplications.some(a => a.clubId === (c.id || c.slug) && a.status === "pending")
+  const eligible = clubs.filter(
+    (c) =>
+      c.status === "approved" &&
+      !state.clubApplications.some(
+        (a) => a.clubId === (c.id || c.slug) && a.status === "pending",
+      ),
   );
   return `
     <div style="position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;">
@@ -1690,22 +2075,26 @@ export function renderClubApplyModal() {
         </div>
         <div style="padding:24px;">
           <p style="font-size:13px;color:#5a4a3a;margin:0 0 20px;font-family:inherit;line-height:1.6;">Select the club you'd like to join as a core member. Your application will be reviewed by the club's current core team.</p>
-          ${eligible.length ? `
+          ${
+            eligible.length
+              ? `
             <div style="margin-bottom:20px;">
               <label style="display:block;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#8a7a6a;margin-bottom:8px;font-family:inherit;">Select Club *</label>
               <select id="club-apply-select" style="width:100%;border:1.5px solid #c8b89a;background:#fff;padding:10px 12px;font-size:14px;font-family:inherit;color:#1a1a1a;outline:none;">
                 <option value="">-- Choose a club --</option>
-                ${eligible.map(c => `<option value="${escapeHtml(c.id || c.slug)}">${escapeHtml(c.name)}</option>`).join("")}
+                ${eligible.map((c) => `<option value="${escapeHtml(c.id || c.slug)}">${escapeHtml(c.name)}</option>`).join("")}
               </select>
             </div>
             <div style="display:flex;gap:10px;">
               <button style="flex:1;background:#D7AC54;color:#1a1a1a;border:none;padding:12px;font-size:12px;font-weight:800;font-family:inherit;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;" data-action="submit-club-application">Submit Application</button>
               <button style="background:none;border:1.5px solid #c8b89a;color:#5a4a3a;padding:12px 20px;font-size:12px;font-weight:700;font-family:inherit;letter-spacing:0.05em;text-transform:uppercase;cursor:pointer;" data-action="close-club-apply-modal">Cancel</button>
             </div>
-          ` : `
+          `
+              : `
             <p style="font-size:13px;color:#8a7a6a;margin:0 0 20px;font-family:inherit;">You have already applied to all available clubs, or have pending applications for each.</p>
             <button style="background:#1a1a1a;color:#f5f2ec;border:none;padding:10px 24px;font-size:12px;font-weight:700;font-family:inherit;text-transform:uppercase;cursor:pointer;" data-action="close-club-apply-modal">Close</button>
-          `}
+          `
+          }
         </div>
       </div>
     </div>
@@ -1734,14 +2123,18 @@ export function renderEditProfileModal() {
           <div style="margin-bottom:24px;">
             <label style="display:block;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#8a7a6a;margin-bottom:8px;font-family:inherit;">Year</label>
             <div style="display:flex;gap:8px;">
-              ${["1", "2", "3", "4"].map(y => `
+              ${["1", "2", "3", "4"]
+                .map(
+                  (y) => `
                 <button style="
                   flex:1;padding:10px;
                   border:1.5px solid ${state.user.year === y ? "#1a1a1a" : "#c8b89a"};
                   background:${state.user.year === y ? "#1a1a1a" : "transparent"};
                   color:${state.user.year === y ? "#f5f2ec" : "#1a1a1a"};
                   font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;
-                " data-action="ep-year" data-year="${y}">${y}</button>`).join("")}
+                " data-action="ep-year" data-year="${y}">${y}</button>`,
+                )
+                .join("")}
             </div>
           </div>
 
@@ -1764,7 +2157,6 @@ export function sectionLabel(number, label) {
     </div>
   `;
 }
-
 
 export * from "./render-admin.js";
 
@@ -1813,15 +2205,23 @@ export function renderEventCard(event) {
         <h3>${escapeHtml(event.title)}</h3>
         <p>${escapeHtml(event.description || "")}</p>
         <div class="chip-grid">${tags.map((tag) => `<span class="tag gold">${escapeHtml(tag)}</span>`).join("")}<span class="tag">${escapeHtml(hostDisplay)}</span></div>
-        ${(event.collaboratingClubs || []).length ? `
+        ${
+          (event.collaboratingClubs || []).length
+            ? `
           <p style="font-size:12px;color:#8a7a6a;margin:3px 0 0;font-family:inherit;">
-            with ${event.collaboratingClubs.map(c => escapeHtml(c)).join(", ")}
-          </p>` : ""}
+            with ${event.collaboratingClubs.map((c) => escapeHtml(c)).join(", ")}
+          </p>`
+            : ""
+        }
         ${actionButtons}
-        ${isMyEvent ? `<div style="display:flex;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid #e8e0d4;">
+        ${
+          isMyEvent
+            ? `<div style="display:flex;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid #e8e0d4;">
           <button style="background:none;border:1.5px solid #c8b89a;padding:4px 12px;font-size:11px;font-weight:600;color:#5a4a3a;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:0.05em;" data-action="open-edit-event" data-docid="${event.id}">Edit</button>
           <button style="background:none;border:1.5px solid #c8b89a;padding:4px 12px;font-size:11px;font-weight:600;color:#a09080;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:0.05em;" data-action="${event.hostType === "school" ? "delete-school-event" : "delete-club-event"}" data-docid="${event.id}">Delete</button>
-        </div>` : ""}
+        </div>`
+            : ""
+        }
       </div>
     </article>
   `;
@@ -1860,7 +2260,12 @@ export function quickCard(route, title, copy, iconName) {
 
 export function renderClubCard(club) {
   const clubId = club.id || club.slug;
-  const clubEvents = events.filter((event) => event.club === club.name || event.host === club.name || event.clubId === clubId).length;
+  const clubEvents = events.filter(
+    (event) =>
+      event.club === club.name ||
+      event.host === club.name ||
+      event.clubId === clubId,
+  ).length;
   const following = isFollowingClub(clubId);
   const identity = clubIdentity(club);
   const accentAttr = identity.accent ? ` data-accent="${identity.accent}"` : "";
@@ -1898,7 +2303,9 @@ export function renderProjectCard(project) {
           <button style="background:none;border:1.5px solid #c8b89a;color:#5a4a3a;padding:6px 14px;font-size:12px;font-weight:600;font-family:inherit;letter-spacing:0.05em;cursor:pointer;text-transform:uppercase;" data-action="${isItemSaved(project.id, "project") ? "unsave-item" : "save-item"}" data-docid="${project.id}" data-kind="project" data-title="${escapeHtml(project.title)}">${isItemSaved(project.id, "project") ? "Saved" : "Save"}</button>
           <button style="background:none;border:none;color:#a09080;padding:6px 10px;font-size:11px;font-family:inherit;cursor:pointer;text-transform:uppercase;letter-spacing:0.05em;" data-action="flag-content" data-docid="${project.id}" data-kind="project" data-title="${escapeHtml(project.title)}">Report</button>
         </div>
-        ${isMyProject ? `<div style="display:flex;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid #e8e0d4;">
+        ${
+          isMyProject
+            ? `<div style="display:flex;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid #e8e0d4;">
           <button style="background:none;border:1.5px solid #c8b89a;padding:4px 12px;font-size:11px;font-weight:600;color:#5a4a3a;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:0.05em;" 
             data-action="toggle-project-status" 
             data-docid="${project.id}" 
@@ -1909,7 +2316,9 @@ export function renderProjectCard(project) {
             data-action="delete-own-project" 
             data-docid="${project.id}" 
             data-title="${escapeHtml(project.title)}">Delete</button>
-        </div>` : ""}
+        </div>`
+            : ""
+        }
       </div>
     </article>
   `;
@@ -1932,7 +2341,6 @@ export function renderAnnouncement(item) {
     </article>
   `;
 }
-
 
 export function renderOnboarding() {
   if (state.onboardingStep === "role") {
@@ -1973,14 +2381,21 @@ export function renderOnboarding() {
         <section class="modal">
           <p class="eyebrow">Personalization</p>
           <h2>Select your interests</h2>
-          <div class="chip-grid">${platformSettings().interestTags.map((interest) => `<button class="chip ${state.user.interests.includes(interest) ? "active" : ""}" data-interest="${interest}">${escapeHtml(interest)}</button>`).join("")}</div>
+          <div class="chip-grid">${platformSettings()
+            .interestTags.map(
+              (interest) =>
+                `<button class="chip ${state.user.interests.includes(interest) ? "active" : ""}" data-interest="${interest}">${escapeHtml(interest)}</button>`,
+            )
+            .join("")}</div>
           <button class="btn gold" data-action="finish-student">Explore your campus</button>
         </section>
       </div>
     `;
   }
   if (state.onboardingStep === "host-info") {
-    const clubOptions = clubs.length ? clubs.map((club) => ({ id: club.id || club.slug, name: club.name })) : [];
+    const clubOptions = clubs.length
+      ? clubs.map((club) => ({ id: club.id || club.slug, name: club.name }))
+      : [];
     return `
       <div class="modal-layer">
         <section class="modal">
@@ -2085,5 +2500,3 @@ export function renderOnboarding() {
   }
   return "";
 }
-
-

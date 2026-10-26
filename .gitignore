@@ -12,6 +12,9 @@ firebase-debug.log
 node_modules/
 functions/node_modules/
 
+# Build output
+www/
+
 # Environment
 .env
 .env.local

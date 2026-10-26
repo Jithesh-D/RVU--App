@@ -17,14 +17,14 @@ async function promptUser(message, defaultValue = "") {
     const label = document.createElement("p");
     label.innerText = message;
     Object.assign(label.style, {
-      marginTop: "0", marginBottom: "16px", fontWeight: "600", color: "#1d1a16", fontSize: "14px"
+      marginTop: "0", marginBottom: "16px", fontWeight: "600", color: "#233039", fontSize: "14px"
     });
 
     const input = document.createElement("input");
     input.type = "text";
     input.value = defaultValue;
     Object.assign(input.style, {
-      width: "100%", padding: "8px", border: "1px solid #ccc", borderRadius: "4px",
+      width: "100%", padding: "8px", border: "1px solid #E2E6E5", borderRadius: "6px",
       boxSizing: "border-box", marginBottom: "24px", fontSize: "14px"
     });
 
@@ -36,15 +36,15 @@ async function promptUser(message, defaultValue = "") {
     const cancelBtn = document.createElement("button");
     cancelBtn.innerText = "Cancel";
     Object.assign(cancelBtn.style, {
-      padding: "8px 16px", border: "1px solid #ccc", backgroundColor: "transparent",
-      borderRadius: "4px", cursor: "pointer", fontSize: "13px"
+      padding: "8px 16px", border: "1px solid #E2E6E5", backgroundColor: "transparent",
+      borderRadius: "6px", cursor: "pointer", fontSize: "13px", color: "#233039"
     });
 
     const okBtn = document.createElement("button");
     okBtn.innerText = "OK";
     Object.assign(okBtn.style, {
-      padding: "8px 16px", border: "none", backgroundColor: "#d4af37",
-      color: "#1d1a16", borderRadius: "4px", fontWeight: "600", cursor: "pointer", fontSize: "13px"
+      padding: "8px 16px", border: "none", backgroundColor: "#D7AC54",
+      color: "#233039", borderRadius: "6px", fontWeight: "600", cursor: "pointer", fontSize: "13px"
     });
 
     btnContainer.append(cancelBtn, okBtn);
@@ -333,7 +333,7 @@ function render() {
     app.innerHTML = `<div style="padding:40px; text-align:center;">
       <h2 style="color:#d93025; font-family:inherit;">Admin Panel Error</h2>
       <p style="color:#666; font-family:inherit;">${err.message}</p>
-      <button onclick="window.location.reload()" style="padding:10px 20px; background:#d4af37; border:none; border-radius:4px; margin-top:20px; cursor:pointer; color:#1d1a16; font-weight:600;">Reload App</button>
+      <button onclick="window.location.reload()" style="padding:10px 20px; background:#D7AC54; border:none; border-radius:6px; margin-top:20px; cursor:pointer; color:#233039; font-weight:600;">Reload App</button>
     </div>`;
   }
 }
@@ -390,7 +390,7 @@ function renderRail() {
   ];
   return `
     <aside class="rail">
-      <img src="./assets/rv-university-logo-gold.png" alt="RV University" />
+      <img src="./assets/RV University Gold Crest Logo.png" alt="RV University" />
       <h1>Super Admin</h1>
       <small>${escapeHtml(state.user.email || "")}</small>
       <nav class="tabs">

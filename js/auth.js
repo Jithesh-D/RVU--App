@@ -241,8 +241,8 @@ export async function syncFirebaseData({ quiet = false } = {}) {
   if (profile.hostApproved !== undefined) state.host.approved = profile.hostApproved;
   if (profile.role === "superAdmin" || profile.onboardingComplete) {
     state.onboardingStep = null;
-  } else if (!state.onboardingStep) {
-    state.onboardingStep = "role";
+  } else if (profile.onboardingComplete === false) {
+    state.onboardingStep = state.onboardingStep || "role";
   }
   const data = await window.RVUFirebase.loadCampusData({ superAdmin: state.role === "admin", profile });
   replaceCollection(clubs, data.clubs);

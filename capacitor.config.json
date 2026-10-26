@@ -1,0 +1,11 @@
+{
+  "appId": "com.rvuconnect.app",
+  "appName": "RVU-Connect",
+  "webDir": "www",
+  "plugins": {
+    "FirebaseAuthentication": {
+      "providers": ["google.com"],
+      "skipNativeAuth": true
+    }
+  }
+}

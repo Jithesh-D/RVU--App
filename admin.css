@@ -1,18 +1,21 @@
-@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cantarell:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Montserrat:wght@400;600;700&display=swap");
 
 :root {
-  --ink: #15130f;
-  --paper: #f6f0e5;
-  --panel: #fffaf1;
-  --line: rgba(21, 19, 15, 0.14);
-  --muted: #756f64;
-  --gold: #d0a863;
-  --teal: #2a6b5e;
+  --teal: #004854;
+  --navy: #233039;
+  --gold: #D7AC54;
+  --gold-deep: #C29650;
+  --bg: #F7F7F4;
+  --paper: #F7F7F4;
+  --panel: #FFFFFF;
+  --line: #E2E6E5;
+  --muted: #5a6a72;
+  --ink: #233039;
   --red: #b84942;
-  --amber: #c47d1a;
-  --mono: "Syne Mono", monospace;
-  --ui: "Syne", system-ui, sans-serif;
-  --display: "Bebas Neue", sans-serif;
+  --green: #2d7d5f;
+  --font-body: Cantarell, "Segoe UI", system-ui, sans-serif;
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-num: "Montserrat", "Segoe UI", system-ui, sans-serif;
   color-scheme: light;
 }
 
@@ -25,17 +28,7 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: var(--ui);
-}
-
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 999;
-  pointer-events: none;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  font-family: var(--font-body);
 }
 
 button,
@@ -95,10 +88,10 @@ button {
 
 .rail h1 {
   margin: 0 0 8px;
-  font-family: var(--display);
-  font-size: 44px;
-  font-weight: 400;
-  line-height: 0.88;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
   flex-shrink: 0;
 }
 
@@ -106,7 +99,7 @@ button {
 .eyebrow,
 .meta,
 .badge {
-  font-family: var(--mono);
+  font-family: var(--font-body);
   font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -139,7 +132,7 @@ button {
   color: rgba(246, 240, 229, 0.7);
   padding: 8px 12px;
   text-align: left;
-  font-family: var(--mono);
+  font-family: var(--font-body);
   font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -154,7 +147,7 @@ button {
 .tabs button:hover,
 .link-button:hover {
   background: var(--gold);
-  color: var(--ink);
+  color: var(--navy);
 }
 
 .rail-actions {
@@ -174,29 +167,26 @@ button {
 .hero {
   border-bottom: 1px solid var(--line);
   padding: 38px clamp(18px, 4vw, 54px);
-  background:
-    linear-gradient(var(--line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--line) 1px, transparent 1px),
-    var(--paper);
-  background-size: 48px 48px;
+  background: var(--panel);
 }
 
 .hero h2 {
   max-width: 900px;
   margin: 8px 0 10px;
-  font-family: var(--display);
-  font-size: clamp(62px, 10vw, 132px);
-  font-weight: 400;
-  line-height: 0.86;
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--teal);
 }
 
 .hero p {
   max-width: 720px;
   margin: 0;
-  color: #3b352c;
-  font-family: "Instrument Serif", Georgia, serif;
-  font-size: clamp(24px, 3vw, 36px);
-  font-style: italic;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: clamp(16px, 2vw, 20px);
+  font-style: normal;
   line-height: 1.05;
 }
 
@@ -215,10 +205,12 @@ button {
 .metric strong {
   display: block;
   margin-top: 8px;
-  font-family: var(--display);
-  font-size: 54px;
-  font-weight: 400;
-  line-height: 0.9;
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--teal);
+  font-family: var(--font-num);
 }
 
 .content {
@@ -243,10 +235,11 @@ button {
 
 .panel h3 {
   margin: 8px 0 16px;
-  font-family: var(--display);
-  font-size: 44px;
-  font-weight: 400;
-  line-height: 0.92;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--teal);
 }
 
 .actions {
@@ -258,9 +251,9 @@ button {
 
 .btn,
 .mini-btn {
-  border: 1px solid var(--ink);
-  background: var(--ink);
-  color: var(--paper);
+  border: 1px solid var(--teal);
+  background: var(--teal);
+  color: #fff;
   padding: 11px 14px;
   font-weight: 800;
 }
@@ -273,7 +266,7 @@ button {
 
 .btn.gold {
   background: var(--gold);
-  color: var(--ink);
+  color: var(--navy);
 }
 
 .row {
@@ -330,7 +323,7 @@ button {
 
 .field label {
   color: var(--muted);
-  font-family: var(--mono);
+  font-family: var(--font-body);
   font-size: 10px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -342,7 +335,7 @@ button {
   width: 100%;
   min-height: 44px;
   border: 1px solid var(--line);
-  background: #fffdf8;
+  background: var(--panel);
   color: var(--ink);
   padding: 10px 12px;
 }
@@ -363,9 +356,9 @@ button {
   border: 1px dashed var(--line);
   padding: 18px;
   color: var(--muted);
-  font-family: "Instrument Serif", Georgia, serif;
-  font-size: 22px;
-  font-style: italic;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-style: normal;
 }
 
 .login {
@@ -384,10 +377,11 @@ button {
 
 .login-card h1 {
   margin: 8px 0 12px;
-  font-family: var(--display);
-  font-size: 70px;
-  font-weight: 400;
-  line-height: 0.88;
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--teal);
 }
 
 .toast {
@@ -397,36 +391,27 @@ button {
   z-index: 1000;
   max-width: 360px;
   border: 1px solid var(--line);
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--navy);
+  color: #fff;
   padding: 12px 14px;
   font-size: 13px;
 }
 
-/* Display typography: Bebas Neue */
-.rail h1,
-.hero h2,
-.metric strong,
-.panel h3,
-.login-card h1,
 .btn,
 .mini-btn {
-  font-family: "Bebas Neue", sans-serif !important;
+  border-radius: 6px;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-.rail h1,
-.hero h2,
-.panel h3,
-.login-card h1 {
-  letter-spacing: -0.005em !important;
-  font-weight: 400 !important;
-}
-
-.btn,
-.mini-btn {
-  letter-spacing: -0.005em !important;
-  font-weight: 400 !important;
-  font-size: 15px !important;
+.btn:focus-visible,
+.mini-btn:focus-visible,
+.tabs button:focus-visible,
+.link-button:focus-visible,
+.field input:focus-visible,
+.field select:focus-visible,
+.field textarea:focus-visible {
+  outline: 3px solid rgba(215, 172, 84, 0.55);
+  outline-offset: 2px;
 }
 
 @media (max-width: 900px) {

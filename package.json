@@ -4,12 +4,14 @@
   "description": "<p align=\"center\">   <img src=\"assets/rv-university-logo-gold.png\" alt=\"RV University Logo\" width=\"120\" /> </p>",
   "main": "admin.js",
   "directories": {
-    "doc": "docs"
+    "test": "tests"
   },
   "scripts": {
     "test": "npm run lint && npm run test:rules",
     "lint": "node --experimental-vm-modules scripts/check-syntax.mjs js/*.js admin.js sample-data.js && node scripts/check-import-map.mjs",
-    "test:rules": "firebase emulators:exec --only firestore --project rvu-connect-rules-test \"node tests/firestore.rules.test.js\""
+    "test:rules": "firebase emulators:exec --only firestore --project rvu-connect-rules-test \"node tests/firestore.rules.test.js\"",
+    "build": "node scripts/build.mjs",
+    "deploy": "npm run build && npx cap sync android"
   },
   "repository": {
     "type": "git",
@@ -24,8 +26,12 @@
   },
   "homepage": "https://github.com/Karthik-sugur/RVU-Connect#readme",
   "dependencies": {
+    "@capacitor-firebase/authentication": "^8.5.2",
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/cli": "^8.5.2",
+    "@capacitor/core": "^8.5.2",
     "@firebase/rules-unit-testing": "^5.0.1",
-    "firebase": "^12.16.0",
+    "firebase": "^12.19.0",
     "firebase-tools": "^12.9.1"
   }
 }

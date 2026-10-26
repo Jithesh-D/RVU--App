@@ -57,7 +57,7 @@ export const state = {
   loginOpen: false,
   hostRequests: [],
   moderationFlags: [],
-  onboardingStep: "role",
+  onboardingStep: null,
   role: null,
   createOpen: false,
   selectedClubSlug: null,

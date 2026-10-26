@@ -1,6 +1,6 @@
 import { app, auth, db, analytics } from "./firebase-init.js";
 import { getDoc, getDocs, setDoc, updateDoc, deleteDoc, deleteField, doc, collection, query, where, orderBy, limit, startAfter, documentId, serverTimestamp, writeBatch } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
-import { onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+import { onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
 import { handleFirebaseError } from "./errors.js";
 import { EMAIL_DOMAIN } from "./constants.js";
 
@@ -30,6 +30,20 @@ function prefersRedirectSignIn() {
 }
 
 async function signInWithGoogle() {
+  // On Capacitor (Android/iOS) use the native Google Sign-In plugin so the flow never
+  // opens a Chrome Custom Tab that redirects to a third-party firebaseapp.com origin.
+  // The resulting idToken is exchanged for a Firebase JS credential so that the existing
+  // onAuthStateChanged / Firestore session is driven by the same Firebase JS Auth instance.
+  if (window.Capacitor?.isNativePlatform?.()) {
+    const { FirebaseAuthentication } = window.Capacitor.Plugins;
+    const result = await FirebaseAuthentication.signInWithGoogle();
+    const idToken = result?.credential?.idToken;
+    if (!idToken) throw new Error("Google Sign-In did not return an ID token.");
+    const credential = GoogleAuthProvider.credential(idToken);
+    const fbResult = await signInWithCredential(auth, credential);
+    return requireRvuUser(fbResult.user);
+  }
+
   const provider = new GoogleAuthProvider();
   provider.setCustomParameters({ hd: "rvu.edu.in", prompt: "select_account" });
   if (prefersRedirectSignIn()) {
